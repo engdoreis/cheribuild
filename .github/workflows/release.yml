@@ -1,0 +1,31 @@
+name: Release artifacts
+
+on: [release]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install
+      run: sudo apt-get update && sudo apt-get install -y zlib1g-dev cmake ninja-build
+
+    - name: Build
+      run: ./cheribuild.py cheri-std093-llvm -d
+
+    - name: Compress
+      run: tar -czvf output/cheri-std093-sdk.tar.gz output/cheri-std093-sdk
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: 'cheri-llvm'
+        path: ./output/cheri-std093-sdk.tar.gz
+
+    - uses: softprops/action-gh-release@v2
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        prerelease: true
+        files: output/cheri-std093-sdk.tar.gz
+
+
