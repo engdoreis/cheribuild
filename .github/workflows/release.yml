@@ -1,0 +1,26 @@
+name: Release artifacts
+
+on: [release]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install
+      run: sudo apt-get update && sudo apt-get install -y zlib1g-dev cmake ninja-build
+
+    - name: Build
+      run: ./cheribuild.py cheri-std093-llvm -d
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: 'cheri-llvm'
+        path: ./output/
+
+    - uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v1
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        prerelease: true
+        files: ./output/
