@@ -1,6 +1,8 @@
 name: Release artifacts
 
-on: [release]
+on:
+  release:
+    types: [published, prereleased]
 
 jobs:
   build:
@@ -12,15 +14,21 @@ jobs:
       run: sudo apt-get update && sudo apt-get install -y zlib1g-dev cmake ninja-build
 
     - name: Build
-      run: ./cheribuild.py cheri-std093-llvm -d
+      run: |
+        ./cheribuild.py cheri-std093-llvm --cheri-std093-llvm/include-projects="clang;clang-tools-extra;llvm;lld" -d
+
+    - name: Create tar
+      run: |
+        tar -czvf cheri-std093-sdk.tar.gz ./output/cheri-std093-sdk
 
     - uses: actions/upload-artifact@v4
       with:
         name: 'cheri-llvm'
-        path: ./output/
+        path: cheri-std093-sdk.tar.gz
 
-    - uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v1
+    - uses: softprops/action-gh-release@v2
       if: startsWith(github.ref, 'refs/tags/')
       with:
         prerelease: true
-        files: ./output/
+        files: cheri-std093-sdk.tar.gz
+
