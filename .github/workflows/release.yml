@@ -15,7 +15,7 @@ jobs:
 
     - name: Build
       run: |
-        ./cheribuild.py cheri-std093-llvm --cheri-std093-llvm/include-projects="clang;clang-tools-extra;llvm;lld" -d
+        ./cheribuild.py cheri-std093-llvm --cheri-std093-llvm/include-projects="clang;clang-tools-extra;llvm;lld;compiler-rt" -d
 
     - name: Create tar
       run: |
