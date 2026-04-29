@@ -9,26 +9,29 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: Install
       run: sudo apt-get update && sudo apt-get install -y zlib1g-dev cmake ninja-build
 
     - name: Build
       run: |
-        ./cheribuild.py cheri-std093-llvm --cheri-std093-llvm/include-projects="clang;clang-tools-extra;llvm;lld" -d
+        ./cheribuild.py cheri-std093-llvm \
+        --cheri-std093-llvm/include-projects="clang;clang-tools-extra;llvm;lld;compiler-rt" \
+        -d
+
 
     - name: Create tar
       run: |
-        tar -czvf cheri-std093-sdk.tar.gz ./output/cheri-std093-sdk
+        tar -czvf cheri-std093-llvm.tar.gz ./output/cheri-std093-llvm
 
     - uses: actions/upload-artifact@v4
       with:
         name: 'cheri-llvm'
-        path: cheri-std093-sdk.tar.gz
+        path: cheri-std093-llvm.tar.gz
 
     - uses: softprops/action-gh-release@v2
       if: startsWith(github.ref, 'refs/tags/')
       with:
         prerelease: true
-        files: cheri-std093-sdk.tar.gz
+        files: cheri-std093-llvm.tar.gz
 
